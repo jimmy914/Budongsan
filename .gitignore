@@ -1,0 +1,31 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# Spring Boot
+*.jar
+*.war
+*.ear
+
+# 환경변수 (절대 올리면 안됨!)
+.env
+application-prod.yml
+application-secret.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로그
+logs/
+*.log
+
+# Claude Code 설정
+.claude/

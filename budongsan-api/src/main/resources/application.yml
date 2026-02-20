@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: local  # 기본은 로컬 환경
+
+---
+# 로컬 환경 설정
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/budongsan
+    username: budongsan
+    password: budongsan1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update       # 로컬에선 자동으로 테이블 생성/수정
+    show-sql: true           # SQL 로그 출력
+    properties:
+      hibernate:
+        format_sql: true     # SQL 보기 좋게 출력
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8080
+
+# JWT 설정
+jwt:
+  secret: budongsanSecretKeyForJWTTokenGenerationMustBe256BitsLong!!
+  access-token-expiration: 1800000    # 30분 (ms)
+  refresh-token-expiration: 604800000  # 7일 (ms)
+
+# Swagger UI
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs

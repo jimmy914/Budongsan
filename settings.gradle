@@ -1,0 +1,4 @@
+rootProject.name = 'budongsan'
+
+include 'budongsan-core'
+include 'budongsan-api'
