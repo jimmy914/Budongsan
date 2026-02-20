@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드 - 부동산 관리</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        header {
+            background: #1a1a2e;
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 20px; }
+        .logout-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .content { padding: 32px; max-width: 900px; margin: 0 auto; }
+        .welcome { font-size: 22px; font-weight: 600; margin-bottom: 24px; color: #1a1a2e; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .card .icon { font-size: 36px; margin-bottom: 12px; }
+        .card h3 { font-size: 15px; color: #333; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🏠 부동산 관리</h1>
+    <button class="logout-btn" onclick="logout()">로그아웃</button>
+</header>
+
+<div class="content">
+    <p class="welcome" id="welcomeMsg">안녕하세요! 👋</p>
+    <div class="cards">
+        <div class="card"><div class="icon">🏠</div><h3>매물 관리</h3></div>
+        <div class="card"><div class="icon">👥</div><h3>팀 관리</h3></div>
+        <div class="card"><div class="icon">📊</div><h3>통계</h3></div>
+        <div class="card"><div class="icon">🗺️</div><h3>지도</h3></div>
+    </div>
+</div>
+
+<script>
+    // 로그인 확인
+    const token = localStorage.getItem('accessToken');
+    if (!token) window.location.href = '/login';
+
+    async function logout() {
+        await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('accessToken') }
+        });
+        localStorage.clear();
+        window.location.href = '/login';
+    }
+</script>
+</body>
+</html>

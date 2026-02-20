@@ -38,4 +38,7 @@ dependencies {
 
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Thymeleaf (웹 UI)
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
