@@ -43,12 +43,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 가능한 URL
                         .requestMatchers(
-                                "/api/auth/**",          // 회원가입, 로그인
-                                "/swagger-ui/**",        // Swagger UI
-                                "/api-docs/**",          // Swagger API 문서
-                                "/",                     // 메인 페이지
-                                "/login",                // 웹 로그인 페이지
-                                "/signup"                // 웹 회원가입 페이지
+                                "/api/auth/**",              // 회원가입, 로그인
+                                "/swagger-ui/**",            // Swagger UI
+                                "/swagger-ui.html",          // Swagger UI HTML
+                                "/v3/api-docs/**",           // Swagger API 문서 (springdoc 기본 경로)
+                                "/api-docs/**",              // Swagger API 문서 (커스텀 경로)
+                                "/webjars/**",               // Swagger 리소스
+                                "/css/**",                   // 정적 CSS
+                                "/js/**",                    // 정적 JS
+                                "/images/**",                // 정적 이미지
+                                "/",                         // 메인 페이지
+                                "/login",                    // 웹 로그인 페이지
+                                "/signup",                   // 웹 회원가입 페이지
+                                "/dashboard"                 // 대시보드 (토큰은 JS에서 검증)
                         ).permitAll()
                         // ADMIN만 접근 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
