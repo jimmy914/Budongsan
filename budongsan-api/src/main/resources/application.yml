@@ -19,10 +19,10 @@ spring:
     hibernate:
       ddl-auto: update       # 로컬에선 자동으로 테이블 생성/수정
     show-sql: true           # SQL 로그 출력
+    open-in-view: false      # WARN 제거
     properties:
       hibernate:
         format_sql: true     # SQL 보기 좋게 출력
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   data:
     redis:
