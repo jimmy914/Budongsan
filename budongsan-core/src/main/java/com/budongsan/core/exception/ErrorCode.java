@@ -38,7 +38,11 @@ public enum ErrorCode {
 
     // ── 파일 ───────────────────────────────────────────────
     INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다."),
-    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
+
+    // ── 건축물 정보 ─────────────────────────────────────────
+    ADDRESS_NOT_FOUND(HttpStatus.BAD_REQUEST, "주소를 찾을 수 없습니다"),
+    BUILDING_NOT_FOUND(HttpStatus.NOT_FOUND, "건축물대장 정보가 없습니다");
 
     private final HttpStatus httpStatus;  // HTTP 상태 코드
     private final String message;         // 에러 메시지

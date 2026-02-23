@@ -37,6 +37,113 @@
         }
         .card .icon { font-size: 36px; margin-bottom: 12px; }
         .card h3 { font-size: 15px; color: #333; }
+
+        /* 주소 검색 영역 */
+        .search-section { margin-top: 32px; }
+        .search-toggle-btn {
+            padding: 12px 24px;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-toggle-btn:hover { background: #2d2d4e; }
+        .search-panel {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .search-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        .search-row input:focus { border-color: #1a1a2e; }
+        .search-btn {
+            padding: 10px 20px;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .search-btn:hover { background: #2d2d4e; }
+        .search-btn:disabled { background: #999; cursor: not-allowed; }
+
+        /* 스피너 */
+        .spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        .spinner::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ddd;
+            border-top-color: #1a1a2e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 결과 테이블 */
+        .result-table {
+            display: none;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .result-table th, .result-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .result-table th {
+            background: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+            width: 140px;
+        }
+        .result-table td { color: #222; }
+        .result-table tr:last-child th,
+        .result-table tr:last-child td { border-bottom: none; }
+        .vltn-y  { color: #e53935; font-weight: 600; }
+        .vltn-n  { color: #43a047; font-weight: 600; }
+        .vltn-unknown { color: #999; }
+
+        .error-msg {
+            display: none;
+            padding: 12px 16px;
+            background: #fff3f3;
+            border: 1px solid #ffcdd2;
+            border-radius: 6px;
+            color: #c62828;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -53,10 +160,37 @@
         <div class="card"><div class="icon">📊</div><h3>통계</h3></div>
         <div class="card"><div class="icon">🗺️</div><h3>지도</h3></div>
     </div>
+
+    <!-- 주소 검색 섹션 -->
+    <div class="search-section">
+        <button class="search-toggle-btn" onclick="toggleSearch()">🔍 주소 검색</button>
+
+        <div class="search-panel" id="searchPanel">
+            <div class="search-row">
+                <input type="text" id="addressInput" placeholder="예: 서울시 강남구 역삼동 123-45"
+                       onkeydown="if(event.key==='Enter') searchBuilding()">
+                <button class="search-btn" id="searchBtn" onclick="searchBuilding()">검색</button>
+            </div>
+
+            <div class="spinner" id="spinner">조회 중...</div>
+            <div class="error-msg" id="errorMsg"></div>
+
+            <table class="result-table" id="resultTable">
+                <tbody>
+                    <tr><th>지목</th><td id="r-jimok">-</td></tr>
+                    <tr><th>대지면적</th><td id="r-platArea">-</td></tr>
+                    <tr><th>연면적</th><td id="r-totArea">-</td></tr>
+                    <tr><th>사용승인일</th><td id="r-useAprDay">-</td></tr>
+                    <tr><th>지상층수</th><td id="r-grndFlrCnt">-</td></tr>
+                    <tr><th>지하층수</th><td id="r-ugrndFlrCnt">-</td></tr>
+                    <tr><th>위반건축물</th><td id="r-vltnBldYn">-</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
-    // 로그인 확인
     const token = localStorage.getItem('accessToken');
     if (!token) window.location.href = '/login';
 
@@ -67,6 +201,88 @@
         });
         localStorage.clear();
         window.location.href = '/login';
+    }
+
+    function toggleSearch() {
+        const panel = document.getElementById('searchPanel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        if (panel.style.display === 'block') {
+            document.getElementById('addressInput').focus();
+        }
+    }
+
+    async function searchBuilding() {
+        const address = document.getElementById('addressInput').value.trim();
+        if (!address) {
+            showError('주소를 입력해주세요.');
+            return;
+        }
+
+        const spinner = document.getElementById('spinner');
+        const resultTable = document.getElementById('resultTable');
+        const errorMsg = document.getElementById('errorMsg');
+        const searchBtn = document.getElementById('searchBtn');
+
+        spinner.style.display = 'block';
+        resultTable.style.display = 'none';
+        errorMsg.style.display = 'none';
+        searchBtn.disabled = true;
+
+        try {
+            const res = await fetch('/api/building/info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                },
+                body: JSON.stringify({ address })
+            });
+
+            const json = await res.json();
+
+            if (!res.ok || !json.success) {
+                showError(json.message || '조회에 실패했습니다.');
+                return;
+            }
+
+            displayResult(json.data);
+        } catch (e) {
+            showError('서버와 통신 중 오류가 발생했습니다.');
+        } finally {
+            spinner.style.display = 'none';
+            searchBtn.disabled = false;
+        }
+    }
+
+    function displayResult(data) {
+        document.getElementById('r-jimok').textContent = data.jimok ?? '-';
+        document.getElementById('r-platArea').textContent = data.platArea != null ? data.platArea + ' ㎡' : '-';
+        document.getElementById('r-totArea').textContent = data.totArea != null ? data.totArea + ' ㎡' : '-';
+        document.getElementById('r-useAprDay').textContent = data.useAprDay ?? '-';
+        document.getElementById('r-grndFlrCnt').textContent = data.grndFlrCnt != null ? data.grndFlrCnt + '층' : '-';
+        document.getElementById('r-ugrndFlrCnt').textContent = data.ugrndFlrCnt != null ? data.ugrndFlrCnt + '층' : '-';
+
+        const vltnCell = document.getElementById('r-vltnBldYn');
+        vltnCell.className = '';
+        if (data.vltnBldYn === 'Y') {
+            vltnCell.textContent = '위반';
+            vltnCell.className = 'vltn-y';
+        } else if (data.vltnBldYn === 'N') {
+            vltnCell.textContent = '정상';
+            vltnCell.className = 'vltn-n';
+        } else {
+            vltnCell.textContent = '확인불가';
+            vltnCell.className = 'vltn-unknown';
+        }
+
+        document.getElementById('resultTable').style.display = 'table';
+    }
+
+    function showError(msg) {
+        const errorMsg = document.getElementById('errorMsg');
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'block';
+        document.getElementById('spinner').style.display = 'none';
     }
 </script>
 </body>

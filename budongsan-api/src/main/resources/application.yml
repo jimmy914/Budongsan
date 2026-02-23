@@ -44,3 +44,18 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /api-docs
+
+# 외부 API 키 (실제 키는 application-local.yml에서 설정)
+kakao:
+  api:
+    key: ${KAKAO_API_KEY:}
+
+data:
+  go:
+    kr:
+      api:
+        key: ${DATA_GO_KR_API_KEY:}
+
+vworld:
+  api:
+    key: ${VWORLD_API_KEY:}
