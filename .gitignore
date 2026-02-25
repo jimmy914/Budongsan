@@ -16,6 +16,7 @@ out/
 
 # 환경변수 (절대 올리면 안됨!)
 .env
+application-local.yml
 application-prod.yml
 application-secret.yml
 
